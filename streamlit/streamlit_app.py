@@ -75,71 +75,32 @@ def inject_styles() -> None:
         .crm-header {{
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-            padding: 1.05rem 1.15rem;
+            justify-content: center;
+            min-height: 13rem;
+            padding: 1.35rem 1.5rem;
             margin-bottom: 1.15rem;
             border: 1px solid var(--line);
             border-radius: 8px;
-            background: linear-gradient(90deg, rgba(2, 10, 24, .74), rgba(4, 20, 45, .44));
-            box-shadow: 0 18px 48px rgba(0, 0, 0, .24);
-            backdrop-filter: blur(8px);
+            background:
+                radial-gradient(circle at 50% 35%, rgba(57, 164, 255, .18), transparent 36%),
+                linear-gradient(90deg, rgba(2, 10, 24, .80), rgba(4, 20, 45, .52));
+            box-shadow: 0 22px 64px rgba(0, 0, 0, .30);
+            backdrop-filter: blur(9px);
         }}
 
         .brand-lockup {{
             display: flex;
             align-items: center;
-            gap: 1rem;
-            min-width: 0;
+            justify-content: center;
+            width: 100%;
         }}
 
         .logo-mark {{
-            width: 9.25rem;
-            max-width: 34vw;
+            width: min(34rem, 72vw);
+            max-height: 10rem;
             height: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1);
-        }}
-
-        .brand-eyebrow {{
-            color: var(--muted);
-            font-size: .78rem;
-            font-weight: 760;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            margin-bottom: .12rem;
-        }}
-
-        .brand-title {{
-            color: #fff;
-            font-size: clamp(1.75rem, 3vw, 2.65rem);
-            font-weight: 820;
-            line-height: 1;
-            margin: 0;
-        }}
-
-        .brand-subtitle {{
-            color: var(--muted);
-            font-size: .94rem;
-            margin-top: .48rem;
-        }}
-
-        .header-meta {{
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: .45rem;
-            flex: 0 0 auto;
-        }}
-
-        .header-chip {{
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, .22);
-            border-radius: 999px;
-            padding: .34rem .62rem;
-            background: rgba(255, 255, 255, .08);
-            font-size: .8rem;
-            font-weight: 720;
+            filter: brightness(0) invert(1) drop-shadow(0 16px 36px rgba(0, 0, 0, .36));
         }}
 
         div[data-testid="stCaptionContainer"] {{
@@ -335,17 +296,13 @@ def inject_styles() -> None:
 
         @media (max-width: 760px) {{
             .crm-header {{
-                align-items: flex-start;
-                flex-direction: column;
-            }}
-
-            .header-meta {{
-                justify-content: flex-start;
+                min-height: 9.5rem;
+                padding: 1rem;
             }}
 
             .logo-mark {{
-                width: 7.8rem;
-                max-width: 56vw;
+                width: min(24rem, 78vw);
+                max-height: 7.6rem;
             }}
 
             .worklist-panel {{
@@ -371,16 +328,6 @@ def render_header() -> None:
         <header class="crm-header">
             <div class="brand-lockup">
                 {logo_html}
-                <div>
-                    <div class="brand-eyebrow">Nova Uniao Etiquetas</div>
-                    <h1 class="brand-title">CRM de Prospecao</h1>
-                    <div class="brand-subtitle">Mesa do vendedor organizada pela ultima_interacao.</div>
-                </div>
-            </div>
-            <div class="header-meta">
-                <span class="header-chip">Leads ativos</span>
-                <span class="header-chip">Supabase</span>
-                <span class="header-chip">Atendimento comercial</span>
             </div>
         </header>
         """,
