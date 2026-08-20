@@ -169,15 +169,13 @@ def inject_styles() -> None:
             box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
         }}
 
-        .lead-header {{
-            padding: .74rem .86rem;
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-bottom: 0;
-            border-radius: 8px 8px 0 0;
-            background: rgba(3, 14, 32, .98);
-        }}
-
         .lead-header-cell {{
+            min-height: 2.45rem;
+            padding: .78rem .72rem .62rem;
+            border-top: 1px solid rgba(255, 255, 255, .28);
+            border-bottom: 1px solid rgba(255, 255, 255, .28);
+            border-right: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(3, 14, 32, .88);
             color: rgba(255, 255, 255, .76);
             font-size: .72rem;
             font-weight: 820;
@@ -185,13 +183,15 @@ def inject_styles() -> None:
             text-transform: uppercase;
         }}
 
-        .lead-row {{
-            padding: .44rem .86rem;
-            border-bottom: 1px solid rgba(255, 255, 255, .08);
-            background: rgba(255, 255, 255, .015);
+        .lead-cell {{
+            min-height: 2.9rem;
+            padding: .32rem .58rem;
+            border-right: 1px solid rgba(255, 255, 255, .14);
+            border-bottom: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(2, 10, 24, .30);
         }}
 
-        .lead-row.selected {{
+        .lead-cell.selected {{
             background: linear-gradient(90deg, rgba(57, 164, 255, .24), rgba(57, 164, 255, .08));
         }}
 
@@ -208,14 +208,22 @@ def inject_styles() -> None:
             font-weight: 820;
         }}
 
+        .lead-grid-left {{
+            border-left: 1px solid rgba(255, 255, 255, .28);
+        }}
+
+        .lead-grid-right {{
+            border-right: 1px solid rgba(255, 255, 255, .28);
+        }}
+
         .stButton > button {{
             justify-content: flex-start;
-            min-height: 2.2rem;
+            min-height: 2.9rem;
             width: 100%;
-            border: 0 !important;
-            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, .14) !important;
+            border-radius: 0;
             color: #fff !important;
-            background: transparent !important;
+            background: rgba(2, 10, 24, .30) !important;
             box-shadow: none !important;
             font-weight: 780;
             overflow: hidden;
@@ -580,11 +588,17 @@ def render_table(df: pd.DataFrame) -> int:
     with center:
         h1, h2, h3 = st.columns([0.28, 0.36, 0.36])
         with h1:
-            st.markdown('<div class="lead-header-cell">Ultima interacao</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="lead-header-cell lead-grid-left">Ultima interacao</div>',
+                unsafe_allow_html=True,
+            )
         with h2:
             st.markdown('<div class="lead-header-cell">Empresa</div>', unsafe_allow_html=True)
         with h3:
-            st.markdown('<div class="lead-header-cell">Decisor</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="lead-header-cell lead-grid-right">Decisor</div>',
+                unsafe_allow_html=True,
+            )
 
         table_container = st.container(height=330, border=False)
         with table_container:
@@ -593,21 +607,20 @@ def render_table(df: pd.DataFrame) -> int:
                 c1, c2, c3 = st.columns([0.28, 0.36, 0.36])
                 with c1:
                     date_class = "date-cell selected" if lead_key == active_key else "date-cell"
+                    cell_class = (
+                        "lead-cell lead-grid-left selected"
+                        if lead_key == active_key
+                        else "lead-cell lead-grid-left"
+                    )
                     st.markdown(
-                        f'<div class="{date_class}">{safe_text(row.ultima_interacao_fmt)}</div>',
+                        f'<div class="{cell_class}"><div class="{date_class}">{safe_text(row.ultima_interacao_fmt)}</div></div>',
                         unsafe_allow_html=True,
                     )
                 with c2:
-                    if st.button(
-                        clean_text(row.nome_exibicao),
-                        key=f"select_empresa_{lead_key}_{index}",
-                    ):
+                    if st.button(clean_text(row.nome_exibicao), key=f"select_empresa_{lead_key}_{index}"):
                         st.session_state.selected_lead_key = lead_key
                 with c3:
-                    if st.button(
-                        clean_text(row.decisor_exibicao),
-                        key=f"select_decisor_{lead_key}_{index}",
-                    ):
+                    if st.button(clean_text(row.decisor_exibicao), key=f"select_decisor_{lead_key}_{index}"):
                         st.session_state.selected_lead_key = lead_key
 
     active_key = selected_lead_key(df)
