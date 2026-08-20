@@ -169,16 +169,55 @@ def inject_styles() -> None:
         }}
 
         .detail-title {{
-            font-size: 1.25rem;
-            font-weight: 760;
-            margin: 1rem 0 .1rem;
+            font-size: clamp(2rem, 4vw, 3.4rem);
+            font-weight: 850;
+            line-height: 1;
+            margin: 1.6rem 0 .45rem;
             color: #fff;
+            text-shadow: 0 18px 42px rgba(0, 0, 0, .38);
         }}
 
         .detail-subtitle {{
             color: var(--muted);
-            font-size: .92rem;
-            margin-bottom: .8rem;
+            font-size: .98rem;
+            margin-bottom: 1.3rem;
+        }}
+
+        .section-title {{
+            color: #fff;
+            font-size: 1.45rem;
+            font-weight: 840;
+            letter-spacing: .02em;
+            margin: 1.2rem 0 .85rem;
+            text-transform: uppercase;
+        }}
+
+        .contact-decision {{
+            width: fit-content;
+            min-width: min(100%, 28rem);
+            margin-bottom: .9rem;
+            padding: .7rem .85rem;
+            border: 1px solid rgba(99, 179, 255, .24);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(57, 164, 255, .16), transparent 46%),
+                rgba(3, 14, 32, .46);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, .26);
+        }}
+
+        .contact-label {{
+            color: rgba(99, 179, 255, .95);
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: .18rem;
+        }}
+
+        .contact-name {{
+            color: #fff;
+            font-size: 1.12rem;
+            font-weight: 780;
         }}
 
         .field-label {{
@@ -484,11 +523,20 @@ def field(label: str, value: Any) -> None:
 
 def render_contact_actions(row: pd.Series) -> None:
     phones = all_phones(row)
-    email = email_url(row.get("email"))
     instagram = normalize_url(row.get("url_instagram"))
     facebook = normalize_url(row.get("url_facebook"))
 
-    st.subheader("Contato")
+    st.markdown('<div class="section-title">Contatos</div>', unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="contact-decision">
+            <div class="contact-label">Decisor</div>
+            <div class="contact-name">{safe_text(row.get("decisor_exibicao"))}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     phone_cols = st.columns(3)
     if phones:
         for index, (label, phone) in enumerate(phones):
@@ -501,37 +549,29 @@ def render_contact_actions(row: pd.Series) -> None:
     else:
         st.caption("Nenhum telefone disponivel.")
 
-    link_cols = st.columns(3)
-    if email:
-        link_cols[0].link_button("Email", email, width="stretch")
-    else:
-        link_cols[0].button("Email", disabled=True, width="stretch")
-    if instagram:
-        link_cols[1].link_button("Instagram", instagram, width="stretch")
-    else:
-        link_cols[1].button("Instagram", disabled=True, width="stretch")
-    if facebook:
-        link_cols[2].link_button("Facebook", facebook, width="stretch")
-    else:
-        link_cols[2].button("Facebook", disabled=True, width="stretch")
+    social_links = [
+        ("Instagram", instagram),
+        ("Facebook", facebook),
+    ]
+    visible_social_links = [(label, url) for label, url in social_links if url]
+    if visible_social_links:
+        social_cols = st.columns(len(visible_social_links))
+        for index, (label, url) in enumerate(visible_social_links):
+            social_cols[index].link_button(label, url, width="stretch")
 
 
 def render_lead_detail(row: pd.Series) -> None:
     st.markdown(
         f"""
         <div class="detail-title">{safe_text(row.get("nome_exibicao"))}</div>
-        <div class="detail-subtitle">
-            {safe_text(row.get("decisor_exibicao"))} &middot;
-            {safe_text(row.get("localizacao"))} &middot;
-            Ultima interacao: {safe_text(row.get("ultima_interacao_fmt"))}
-        </div>
+        <div class="detail-subtitle">Ultima interacao: {safe_text(row.get("ultima_interacao_fmt"))}</div>
         """,
         unsafe_allow_html=True,
     )
 
     render_contact_actions(row)
 
-    st.subheader("Dados do lead")
+    st.markdown('<div class="section-title">Dados do lead</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
         field("Empresa", row.get("empresa"))
