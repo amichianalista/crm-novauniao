@@ -160,22 +160,13 @@ def inject_styles() -> None:
             background: rgba(57, 164, 255, .22) !important;
         }}
 
-        .lead-table-wrap {{
-            height: 330px;
-            overflow: auto;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: linear-gradient(180deg, rgba(4, 16, 36, .94), rgba(2, 9, 22, .90));
-            box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
-        }}
-
         .lead-header-cell {{
-            min-height: 2.45rem;
-            padding: .78rem .72rem .62rem;
+            min-height: 2.75rem;
+            padding: .84rem .88rem .7rem;
             border-top: 1px solid rgba(255, 255, 255, .28);
             border-bottom: 1px solid rgba(255, 255, 255, .28);
             border-right: 1px solid rgba(255, 255, 255, .18);
-            background: rgba(3, 14, 32, .88);
+            background: rgba(3, 14, 32, .72);
             color: rgba(255, 255, 255, .76);
             font-size: .72rem;
             font-weight: 820;
@@ -185,7 +176,7 @@ def inject_styles() -> None:
 
         .lead-cell {{
             min-height: 2.9rem;
-            padding: .32rem .58rem;
+            padding: 0;
             border-right: 1px solid rgba(255, 255, 255, .14);
             border-bottom: 1px solid rgba(255, 255, 255, .14);
             background: rgba(2, 10, 24, .30);
@@ -196,8 +187,8 @@ def inject_styles() -> None:
         }}
 
         .date-cell {{
-            min-height: 2.2rem;
-            padding: .45rem .2rem;
+            min-height: 2.9rem;
+            padding: .72rem .88rem;
             color: rgba(255, 255, 255, .80);
             font-size: .92rem;
             white-space: nowrap;
@@ -227,6 +218,7 @@ def inject_styles() -> None:
             box-shadow: none !important;
             font-weight: 780;
             overflow: hidden;
+            padding: .72rem .88rem;
             text-align: left;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -586,7 +578,7 @@ def render_table(df: pd.DataFrame) -> int:
 
     _, center, _ = st.columns([0.14, 0.72, 0.14])
     with center:
-        h1, h2, h3 = st.columns([0.28, 0.36, 0.36])
+        h1, h2, h3 = st.columns([0.28, 0.36, 0.36], gap=None)
         with h1:
             st.markdown(
                 '<div class="lead-header-cell lead-grid-left">Ultima interacao</div>',
@@ -600,11 +592,11 @@ def render_table(df: pd.DataFrame) -> int:
                 unsafe_allow_html=True,
             )
 
-        table_container = st.container(height=330, border=False)
+        table_container = st.container(height=330, border=True)
         with table_container:
             for index, row in enumerate(df.itertuples()):
                 lead_key = str(row.lead_key)
-                c1, c2, c3 = st.columns([0.28, 0.36, 0.36])
+                c1, c2, c3 = st.columns([0.28, 0.36, 0.36], gap=None)
                 with c1:
                     date_class = "date-cell selected" if lead_key == active_key else "date-cell"
                     cell_class = (
@@ -617,10 +609,18 @@ def render_table(df: pd.DataFrame) -> int:
                         unsafe_allow_html=True,
                     )
                 with c2:
-                    if st.button(clean_text(row.nome_exibicao), key=f"select_empresa_{lead_key}_{index}"):
+                    if st.button(
+                        clean_text(row.nome_exibicao),
+                        key=f"select_empresa_{lead_key}_{index}",
+                        width="stretch",
+                    ):
                         st.session_state.selected_lead_key = lead_key
                 with c3:
-                    if st.button(clean_text(row.decisor_exibicao), key=f"select_decisor_{lead_key}_{index}"):
+                    if st.button(
+                        clean_text(row.decisor_exibicao),
+                        key=f"select_decisor_{lead_key}_{index}",
+                        width="stretch",
+                    ):
                         st.session_state.selected_lead_key = lead_key
 
     active_key = selected_lead_key(df)
