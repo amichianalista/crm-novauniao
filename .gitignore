@@ -1,0 +1,10 @@
+*
+!.gitignore
+!streamlit/
+!streamlit/**
+
+streamlit/.env
+streamlit/.streamlit/secrets.toml
+streamlit/.venv/
+streamlit/__pycache__/
+streamlit/**/*.py[cod]
