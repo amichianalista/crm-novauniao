@@ -183,6 +183,35 @@ def inject_styles() -> None:
             margin-bottom: 1.3rem;
         }}
 
+        .cnpj-highlight {{
+            display: inline-flex;
+            align-items: center;
+            gap: .48rem;
+            width: fit-content;
+            margin: 0 0 .72rem;
+            padding: .46rem .72rem;
+            border: 1px solid rgba(99, 179, 255, .36);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(57, 164, 255, .20), transparent 48%),
+                rgba(3, 14, 32, .58);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, .24);
+        }}
+
+        .cnpj-label {{
+            color: rgba(99, 179, 255, .98);
+            font-size: .72rem;
+            font-weight: 820;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }}
+
+        .cnpj-value {{
+            color: #fff;
+            font-size: 1.02rem;
+            font-weight: 820;
+        }}
+
         .section-title {{
             color: #fff;
             font-size: 1.45rem;
@@ -561,9 +590,21 @@ def render_contact_actions(row: pd.Series) -> None:
 
 
 def render_lead_detail(row: pd.Series) -> None:
+    cnpj = clean_text(row.get("cnpj"), "")
+    cnpj_html = (
+        f"""
+        <div class="cnpj-highlight">
+            <span class="cnpj-label">CNPJ</span>
+            <span class="cnpj-value">{safe_text(cnpj)}</span>
+        </div>
+        """
+        if cnpj
+        else ""
+    )
     st.markdown(
         f"""
         <div class="detail-title">{safe_text(row.get("nome_exibicao"))}</div>
+        {cnpj_html}
         <div class="detail-subtitle">Ultima interacao: {safe_text(row.get("ultima_interacao_fmt"))}</div>
         """,
         unsafe_allow_html=True,
