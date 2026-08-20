@@ -160,14 +160,6 @@ def inject_styles() -> None:
             background: rgba(57, 164, 255, .22) !important;
         }}
 
-        [data-testid="stDataFrame"] {{
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            overflow: hidden;
-            background: linear-gradient(180deg, rgba(4, 16, 36, .94), rgba(2, 9, 22, .90));
-            box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
-        }}
-
         .lead-table-wrap {{
             height: 330px;
             overflow: auto;
@@ -177,66 +169,64 @@ def inject_styles() -> None:
             box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
         }}
 
-        .lead-table {{
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
+        .lead-header {{
+            padding: .74rem .86rem;
+            border: 1px solid rgba(255, 255, 255, .16);
+            border-bottom: 0;
+            border-radius: 8px 8px 0 0;
+            background: rgba(3, 14, 32, .98);
         }}
 
-        .lead-table th {{
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            padding: .74rem .86rem;
-            border-bottom: 1px solid rgba(255, 255, 255, .16);
-            background: rgba(3, 14, 32, .98);
+        .lead-header-cell {{
             color: rgba(255, 255, 255, .76);
             font-size: .72rem;
             font-weight: 820;
             letter-spacing: .06em;
-            text-align: left;
             text-transform: uppercase;
         }}
 
-        .lead-table td {{
-            padding: .68rem .86rem;
+        .lead-row {{
+            padding: .44rem .86rem;
             border-bottom: 1px solid rgba(255, 255, 255, .08);
-            color: #fff;
-            font-size: .92rem;
-            vertical-align: middle;
-        }}
-
-        .lead-table tr {{
             background: rgba(255, 255, 255, .015);
         }}
 
-        .lead-table tr:hover {{
-            background: rgba(57, 164, 255, .12);
-        }}
-
-        .lead-table tr.selected {{
+        .lead-row.selected {{
             background: linear-gradient(90deg, rgba(57, 164, 255, .24), rgba(57, 164, 255, .08));
         }}
 
-        .lead-table a {{
-            display: block;
-            color: #fff !important;
-            font-weight: 760;
-            text-decoration: none;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }}
-
-        .lead-table a:hover {{
-            color: #8bd0ff !important;
-            text-decoration: none;
-        }}
-
-        .lead-table .date-cell {{
-            width: 9.8rem;
+        .date-cell {{
+            min-height: 2.2rem;
+            padding: .45rem .2rem;
             color: rgba(255, 255, 255, .80);
+            font-size: .92rem;
             white-space: nowrap;
+        }}
+
+        .date-cell.selected {{
+            color: #8bd0ff;
+            font-weight: 820;
+        }}
+
+        .stButton > button {{
+            justify-content: flex-start;
+            min-height: 2.2rem;
+            width: 100%;
+            border: 0 !important;
+            border-radius: 6px;
+            color: #fff !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            font-weight: 780;
+            overflow: hidden;
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }}
+
+        .stButton > button:hover {{
+            color: #8bd0ff !important;
+            background: rgba(57, 164, 255, .12) !important;
         }}
 
         .detail-title {{
@@ -335,7 +325,6 @@ def inject_styles() -> None:
             margin-bottom: .72rem;
         }}
 
-        .stButton > button,
         .stLinkButton > a {{
             border-radius: 8px;
             font-weight: 700;
@@ -575,54 +564,53 @@ def render_period_selector(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def selected_lead_key(df: pd.DataFrame) -> str:
-    query_value = st.query_params.get("lead", "")
-    if isinstance(query_value, list):
-        query_value = query_value[0] if query_value else ""
+    query_value = str(st.session_state.get("selected_lead_key", ""))
     valid_keys = set(df["lead_key"].astype(str))
     if query_value in valid_keys:
-        return str(query_value)
-    return str(df.iloc[0]["lead_key"])
+        return query_value
+    first_key = str(df.iloc[0]["lead_key"])
+    st.session_state.selected_lead_key = first_key
+    return first_key
 
 
 def render_table(df: pd.DataFrame) -> int:
     active_key = selected_lead_key(df)
-    rows = []
-    for row in df.itertuples():
-        lead_key = str(row.lead_key)
-        href = f"?lead={quote(lead_key, safe='')}"
-        row_class = "selected" if lead_key == active_key else ""
-        rows.append(
-            f"""
-            <tr class="{row_class}">
-                <td class="date-cell">{safe_text(row.ultima_interacao_fmt)}</td>
-                <td><a href="{href}">{safe_text(row.nome_exibicao)}</a></td>
-                <td><a href="{href}">{safe_text(row.decisor_exibicao)}</a></td>
-            </tr>
-            """
-        )
 
     _, center, _ = st.columns([0.14, 0.72, 0.14])
     with center:
-        st.markdown(
-            f"""
-            <div class="lead-table-wrap">
-                <table class="lead-table">
-                    <thead>
-                        <tr>
-                            <th>Ultima interacao</th>
-                            <th>Empresa</th>
-                            <th>Decisor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {''.join(rows)}
-                    </tbody>
-                </table>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        h1, h2, h3 = st.columns([0.28, 0.36, 0.36])
+        with h1:
+            st.markdown('<div class="lead-header-cell">Ultima interacao</div>', unsafe_allow_html=True)
+        with h2:
+            st.markdown('<div class="lead-header-cell">Empresa</div>', unsafe_allow_html=True)
+        with h3:
+            st.markdown('<div class="lead-header-cell">Decisor</div>', unsafe_allow_html=True)
 
+        table_container = st.container(height=330, border=False)
+        with table_container:
+            for index, row in enumerate(df.itertuples()):
+                lead_key = str(row.lead_key)
+                c1, c2, c3 = st.columns([0.28, 0.36, 0.36])
+                with c1:
+                    date_class = "date-cell selected" if lead_key == active_key else "date-cell"
+                    st.markdown(
+                        f'<div class="{date_class}">{safe_text(row.ultima_interacao_fmt)}</div>',
+                        unsafe_allow_html=True,
+                    )
+                with c2:
+                    if st.button(
+                        clean_text(row.nome_exibicao),
+                        key=f"select_empresa_{lead_key}_{index}",
+                    ):
+                        st.session_state.selected_lead_key = lead_key
+                with c3:
+                    if st.button(
+                        clean_text(row.decisor_exibicao),
+                        key=f"select_decisor_{lead_key}_{index}",
+                    ):
+                        st.session_state.selected_lead_key = lead_key
+
+    active_key = selected_lead_key(df)
     selected_rows = df.index[df["lead_key"].astype(str) == active_key].tolist()
     return int(selected_rows[0]) if selected_rows else 0
 
