@@ -17,6 +17,7 @@ from psycopg import sql
 
 APP_DIR = Path(__file__).resolve().parent
 BACKGROUND_PATH = APP_DIR / "assets" / "Background.png"
+LOGO_PATH = APP_DIR / "assets" / "logo.png"
 SCHEMA_NAME = "clientes_novauniao"
 TABLE_NAME = "prospecao_mkt"
 APP_TIMEZONE = "America/Sao_Paulo"
@@ -44,9 +45,10 @@ def inject_styles() -> None:
         f"""
         <style>
         :root {{
-            --ink: #18212c;
-            --muted: #5f6b7a;
-            --line: rgba(24, 33, 44, .18);
+            --ink: #ffffff;
+            --muted: rgba(255, 255, 255, .76);
+            --line: rgba(255, 255, 255, .20);
+            --panel: rgba(3, 12, 28, .58);
         }}
 
         .stApp {{
@@ -62,31 +64,110 @@ def inject_styles() -> None:
             padding-bottom: 2rem;
         }}
 
-        h1, h2, h3, p, label {{
+        html, body, .stApp,
+        .stApp h1, .stApp h2, .stApp h3,
+        .stApp p, .stApp label, .stApp span,
+        .stApp div, .stApp button {{
             color: var(--ink);
             letter-spacing: 0;
         }}
 
-        h1 {{
-            font-size: 1.75rem;
-            margin-bottom: .15rem;
+        .crm-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.05rem 1.15rem;
+            margin-bottom: 1.15rem;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: linear-gradient(90deg, rgba(2, 10, 24, .74), rgba(4, 20, 45, .44));
+            box-shadow: 0 18px 48px rgba(0, 0, 0, .24);
+            backdrop-filter: blur(8px);
+        }}
+
+        .brand-lockup {{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+        }}
+
+        .logo-mark {{
+            width: 9.25rem;
+            max-width: 34vw;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }}
+
+        .brand-eyebrow {{
+            color: var(--muted);
+            font-size: .78rem;
+            font-weight: 760;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: .12rem;
+        }}
+
+        .brand-title {{
+            color: #fff;
+            font-size: clamp(1.75rem, 3vw, 2.65rem);
+            font-weight: 820;
+            line-height: 1;
+            margin: 0;
+        }}
+
+        .brand-subtitle {{
+            color: var(--muted);
+            font-size: .94rem;
+            margin-top: .48rem;
+        }}
+
+        .header-meta {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: .45rem;
+            flex: 0 0 auto;
+        }}
+
+        .header-chip {{
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 999px;
+            padding: .34rem .62rem;
+            background: rgba(255, 255, 255, .08);
+            font-size: .8rem;
+            font-weight: 720;
         }}
 
         div[data-testid="stCaptionContainer"] {{
-            color: var(--muted);
+            color: var(--muted) !important;
+        }}
+
+        div[data-testid="stCaptionContainer"] p,
+        div[data-testid="stMarkdownContainer"] p {{
+            color: var(--muted) !important;
+        }}
+
+        div[data-baseweb="select"] *,
+        [data-testid="stSelectbox"] * {{
+            color: #fff !important;
         }}
 
         [data-testid="stDataFrame"] {{
             border: 1px solid var(--line);
             border-radius: 8px;
             overflow: hidden;
+            background: rgba(3, 12, 28, .82);
         }}
 
         .detail-title {{
             font-size: 1.25rem;
             font-weight: 760;
             margin: 1rem 0 .1rem;
-            color: var(--ink);
+            color: #fff;
         }}
 
         .detail-subtitle {{
@@ -104,7 +185,7 @@ def inject_styles() -> None:
         }}
 
         .field-value {{
-            color: var(--ink);
+            color: #fff;
             font-size: .95rem;
             word-break: break-word;
             margin-bottom: .72rem;
@@ -116,7 +197,48 @@ def inject_styles() -> None:
             font-weight: 700;
             min-height: 2.35rem;
         }}
+
+        @media (max-width: 760px) {{
+            .crm-header {{
+                align-items: flex-start;
+                flex-direction: column;
+            }}
+
+            .header-meta {{
+                justify-content: flex-start;
+            }}
+
+            .logo-mark {{
+                width: 7.8rem;
+                max-width: 56vw;
+            }}
+        }}
         </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_header() -> None:
+    logo = image_data_uri(LOGO_PATH)
+    logo_html = f'<img class="logo-mark" src="{logo}" alt="Nova Uniao">' if logo else ""
+    st.markdown(
+        f"""
+        <header class="crm-header">
+            <div class="brand-lockup">
+                {logo_html}
+                <div>
+                    <div class="brand-eyebrow">Nova Uniao Etiquetas</div>
+                    <h1 class="brand-title">CRM de Prospecao</h1>
+                    <div class="brand-subtitle">Mesa do vendedor organizada pela ultima_interacao.</div>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="header-chip">Leads ativos</span>
+                <span class="header-chip">Supabase</span>
+                <span class="header-chip">Atendimento comercial</span>
+            </div>
+        </header>
         """,
         unsafe_allow_html=True,
     )
@@ -448,8 +570,7 @@ def main() -> None:
     with st.spinner("Carregando leads do Supabase..."):
         df = load_leads()
 
-    st.title("CRM Nova Uniao")
-    st.caption("Leads organizados pela data da ultima_interacao.")
+    render_header()
 
     if df.empty:
         st.warning("Nenhum lead encontrado na tabela.")
