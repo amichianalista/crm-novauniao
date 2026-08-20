@@ -156,11 +156,82 @@ def inject_styles() -> None:
             color: #fff !important;
         }}
 
+        div[data-baseweb="select"] > div {{
+            background: rgba(5, 18, 42, .88) !important;
+            border-color: rgba(99, 179, 255, .34) !important;
+            box-shadow: 0 12px 34px rgba(0, 0, 0, .24);
+        }}
+
+        div[data-baseweb="popover"],
+        ul[role="listbox"] {{
+            background: #071326 !important;
+            border-color: rgba(99, 179, 255, .26) !important;
+        }}
+
+        li[role="option"] {{
+            color: #fff !important;
+            background: #071326 !important;
+        }}
+
+        li[role="option"]:hover {{
+            background: rgba(57, 164, 255, .22) !important;
+        }}
+
         [data-testid="stDataFrame"] {{
             border: 1px solid var(--line);
             border-radius: 8px;
             overflow: hidden;
-            background: rgba(3, 12, 28, .82);
+            background: linear-gradient(180deg, rgba(4, 16, 36, .94), rgba(2, 9, 22, .90));
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
+        }}
+
+        .worklist-panel {{
+            width: min(100%, 920px);
+            margin: 1.1rem auto 1.45rem;
+            padding: .9rem;
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(0, 122, 255, .16), transparent 42%),
+                linear-gradient(180deg, rgba(4, 18, 42, .72), rgba(1, 7, 18, .64));
+            box-shadow: 0 28px 90px rgba(0, 0, 0, .40);
+            backdrop-filter: blur(10px);
+        }}
+
+        .worklist-head {{
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: .75rem;
+            padding: .1rem .1rem 0;
+        }}
+
+        .worklist-kicker {{
+            color: rgba(99, 179, 255, .98);
+            font-size: .72rem;
+            font-weight: 780;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: .18rem;
+        }}
+
+        .worklist-title {{
+            color: #fff;
+            font-size: 1.14rem;
+            font-weight: 780;
+            line-height: 1.15;
+        }}
+
+        .worklist-count {{
+            color: #fff;
+            min-width: fit-content;
+            border: 1px solid rgba(255, 255, 255, .20);
+            border-radius: 999px;
+            padding: .34rem .66rem;
+            background: rgba(255, 255, 255, .08);
+            font-size: .82rem;
+            font-weight: 720;
         }}
 
         .detail-title {{
@@ -196,6 +267,10 @@ def inject_styles() -> None:
             border-radius: 8px;
             font-weight: 700;
             min-height: 2.35rem;
+            color: #fff !important;
+            border-color: rgba(99, 179, 255, .28) !important;
+            background: linear-gradient(135deg, rgba(13, 92, 170, .92), rgba(9, 37, 76, .92)) !important;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .25);
         }}
 
         @media (max-width: 760px) {{
@@ -211,6 +286,15 @@ def inject_styles() -> None:
             .logo-mark {{
                 width: 7.8rem;
                 max-width: 56vw;
+            }}
+
+            .worklist-panel {{
+                padding: .7rem;
+            }}
+
+            .worklist-head {{
+                align-items: flex-start;
+                flex-direction: column;
             }}
         }}
         </style>
@@ -446,39 +530,44 @@ def render_table(df: pd.DataFrame) -> int:
             "ultima_interacao_fmt",
             "nome_exibicao",
             "decisor_exibicao",
-            "telefone_formatado",
-            "email",
-            "localizacao",
-            "cliente_sga_fmt",
         ]
     ].rename(
         columns={
             "ultima_interacao_fmt": "Ultima interacao",
-            "nome_exibicao": "Empresa / Lead",
+            "nome_exibicao": "Empresa",
             "decisor_exibicao": "Decisor",
-            "telefone_formatado": "Telefone",
-            "email": "Email",
-            "localizacao": "Localizacao",
-            "cliente_sga_fmt": "Cliente SGA",
         }
     )
-    event = st.dataframe(
-        table,
-        width="stretch",
-        height=430,
-        hide_index=True,
-        on_select="rerun",
-        selection_mode="single-row",
-        column_config={
-            "Ultima interacao": st.column_config.TextColumn("Ultima interacao", width="small"),
-            "Empresa / Lead": st.column_config.TextColumn("Empresa / Lead", width="large"),
-            "Decisor": st.column_config.TextColumn("Decisor", width="medium"),
-            "Telefone": st.column_config.TextColumn("Telefone", width="small"),
-            "Email": st.column_config.TextColumn("Email", width="medium"),
-            "Localizacao": st.column_config.TextColumn("Localizacao", width="small"),
-            "Cliente SGA": st.column_config.TextColumn("Cliente SGA", width="small"),
-        },
-    )
+
+    _, center, _ = st.columns([0.14, 0.72, 0.14])
+    with center:
+        st.markdown(
+            f"""
+            <section class="worklist-panel">
+                <div class="worklist-head">
+                    <div>
+                        <div class="worklist-kicker">Fila comercial</div>
+                        <div class="worklist-title">Leads por ultima_interacao</div>
+                    </div>
+                    <div class="worklist-count">{len(df)} leads</div>
+                </div>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        event = st.dataframe(
+            table,
+            width="stretch",
+            height=330,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            column_config={
+                "Ultima interacao": st.column_config.TextColumn("Ultima interacao", width="small"),
+                "Empresa": st.column_config.TextColumn("Empresa", width="large"),
+                "Decisor": st.column_config.TextColumn("Decisor", width="medium"),
+            },
+        )
 
     selected_rows = event.selection.rows if event and event.selection else []
     if selected_rows:

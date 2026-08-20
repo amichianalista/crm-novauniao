@@ -1,5 +1,7 @@
 *
 !.gitignore
+!.streamlit/
+!.streamlit/config.toml
 !streamlit/
 !streamlit/**
 
