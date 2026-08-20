@@ -151,15 +151,75 @@ def inject_styles() -> None:
             color: var(--muted) !important;
         }}
 
+        .period-control {{
+            width: 100%;
+            margin-top: .1rem;
+            padding: .78rem .82rem .7rem;
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 8px;
+            background:
+                linear-gradient(135deg, rgba(57, 164, 255, .18), transparent 48%),
+                linear-gradient(180deg, rgba(4, 18, 42, .76), rgba(1, 7, 18, .62));
+            box-shadow: 0 18px 52px rgba(0, 0, 0, .32);
+            backdrop-filter: blur(10px);
+        }}
+
+        .period-kicker {{
+            color: rgba(99, 179, 255, .98);
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: .16rem;
+        }}
+
+        .period-title {{
+            color: #fff;
+            font-size: .98rem;
+            font-weight: 760;
+            line-height: 1.15;
+        }}
+
+        .period-note {{
+            color: var(--muted);
+            font-size: .78rem;
+            margin-top: .28rem;
+        }}
+
+        .period-context {{
+            margin-top: 1.55rem;
+            padding: .72rem .9rem;
+            border-left: 2px solid rgba(99, 179, 255, .72);
+            background: linear-gradient(90deg, rgba(4, 18, 42, .46), rgba(4, 18, 42, .06));
+        }}
+
+        .period-context div {{
+            color: var(--muted) !important;
+            font-size: .88rem;
+        }}
+
+        .stSelectbox label {{
+            display: none;
+        }}
+
         div[data-baseweb="select"] *,
         [data-testid="stSelectbox"] * {{
             color: #fff !important;
         }}
 
         div[data-baseweb="select"] > div {{
-            background: rgba(5, 18, 42, .88) !important;
-            border-color: rgba(99, 179, 255, .34) !important;
-            box-shadow: 0 12px 34px rgba(0, 0, 0, .24);
+            min-height: 3rem;
+            border-radius: 8px !important;
+            background:
+                linear-gradient(180deg, rgba(10, 38, 78, .92), rgba(3, 14, 32, .92)) !important;
+            border: 1px solid rgba(99, 179, 255, .42) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .10),
+                0 12px 34px rgba(0, 0, 0, .28);
+        }}
+
+        div[data-baseweb="select"] > div:hover {{
+            border-color: rgba(99, 179, 255, .72) !important;
         }}
 
         div[data-baseweb="popover"],
@@ -514,10 +574,26 @@ def filter_by_period(df: pd.DataFrame, period: str) -> pd.DataFrame:
 def render_period_selector(df: pd.DataFrame) -> pd.DataFrame:
     c1, c2 = st.columns([0.28, 0.72])
     with c1:
+        st.markdown(
+            """
+            <div class="period-control">
+                <div class="period-kicker">Preferencia da fila</div>
+                <div class="period-title">Ultima interacao</div>
+                <div class="period-note">Escolha o recorte de trabalho</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         period = st.selectbox("Ultima interacao", PERIOD_OPTIONS, index=0)
     with c2:
-        st.write("")
-        st.caption("Os leads abaixo seguem sempre a data da ultima_interacao, do mais recente para o mais antigo.")
+        st.markdown(
+            """
+            <div class="period-context">
+                <div>Os leads seguem a data da ultima_interacao, sempre do mais recente para o mais antigo.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     filtered = filter_by_period(df, period)
     st.caption(f"{len(filtered)} leads encontrados em: {period}")
