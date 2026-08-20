@@ -612,15 +612,12 @@ def render_lead_detail(row: pd.Series) -> None:
 
     render_contact_actions(row)
 
-    st.markdown('<div class="section-title">Dados do lead</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Dados complementares</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
-        field("Empresa", row.get("empresa"))
-        field("Decisor", row.get("decisor"))
         field("Email", row.get("email"))
-        field("CNPJ", row.get("cnpj"))
-    with c2:
         field("Municipio / UF", row.get("localizacao"))
+    with c2:
         field("Endereco", row.get("endereco"))
         field("Natureza juridica", row.get("natureza_juridica"))
         field("Cliente SGA", row.get("cliente_sga_fmt"))
@@ -628,7 +625,6 @@ def render_lead_detail(row: pd.Series) -> None:
         field("Porte", row.get("porte"))
         field("Capital social", row.get("capital_social"))
         field("Anos de mercado", row.get("anos_mercado"))
-        field("Ultima interacao", row.get("ultima_interacao_fmt"))
 
 
 def main() -> None:
